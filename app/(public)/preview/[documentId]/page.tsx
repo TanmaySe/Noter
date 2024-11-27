@@ -7,6 +7,7 @@ import { Skeleton } from "@/components/ui/skeleton"
 import { api } from "@/convex/_generated/api"
 import { Id } from "@/convex/_generated/dataModel"
 import { useMutation, useQuery } from "convex/react"
+import {useRouter} from "next/navigation"
 
 interface DocumentIdPageProps{
     params:{
@@ -14,11 +15,17 @@ interface DocumentIdPageProps{
     }
 }
 const DocumentIdPage = ({params}:DocumentIdPageProps) => {
+    const router = useRouter();
 
     const document = useQuery(api.documents.getByIdPreview,{
         documentId:params.documentId
     })
-    
+    const childrenNotes = useQuery(api.documents.getChildren,{
+        parentDocument:params.documentId
+    })
+    const handleNoteClick = (noteId: string) => {
+        router.push(`/preview/${noteId}`);
+    };
     if(document === undefined){
         return (
             <div>
@@ -45,6 +52,25 @@ const DocumentIdPage = ({params}:DocumentIdPageProps) => {
             <Cover preview url={document.coverImage}/>
             <div className="md:max-w-3xl lg:max-w-4xl max-auto">
                 <Toolbar preview initialData={document}/>
+                {childrenNotes && childrenNotes.length > 0 && (
+                    <div className="mt-6">
+                        <h2 className="text-lg font-bold mb-4">Table of Contents</h2>
+                        <ul className="space-y-4 mt-4 pl-8">
+                            {childrenNotes.map((childNote) => (
+                                <li
+                                    key={childNote._id}
+                                    className="border-l-4 border-blue-500 pl-4 hover:bg-gray-100 cursor-pointer"
+                                    onClick={() => handleNoteClick(childNote._id)}
+                                >
+                                    <h3 className="font-semibold text-blue-600 hover:underline">
+                                        {childNote.title}
+                                    </h3>
+                                </li>
+                            ))}
+                        </ul>
+                    </div>
+                )}
+
                 <Editor editable={false} initialContent={document.content} id={params.documentId}/>
                 
             </div>

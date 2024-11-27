@@ -369,28 +369,43 @@ export const publish = mutation({
         return document
     }
     })
-    export const getByIdPreview = query({
-        args:{
-            documentId:v.id("documents")
-        },
-        handler:async(ctx,args)=>{
-            const document = await ctx.db.get(args.documentId)
-            if(!document){
-                throw new Error("Document not found")
-            }
-            if(document.isArchived || !document.isPublished){
-                throw new Error("Document not available")
-            }
-            // if(document.isPublished && !document.isArchived){
-            //     return document
-            // }
-            // if(!identity){
-            //     throw new Error("Not authorised")
-            // }
-            // const userId = identity.subject
-            // if(document.userId !== userId){
-            //     throw new Error("Not authorised")
-            // }
-            return document
+export const getByIdPreview = query({
+    args:{
+        documentId:v.id("documents")
+    },
+    handler:async(ctx,args)=>{
+        const document = await ctx.db.get(args.documentId)
+        if(!document){
+            throw new Error("Document not found")
         }
-    })
+        if(document.isArchived || !document.isPublished){
+            throw new Error("Document not available")
+        }
+        // if(document.isPublished && !document.isArchived){
+        //     return document
+        // }
+        // if(!identity){
+        //     throw new Error("Not authorised")
+        // }
+        // const userId = identity.subject
+        // if(document.userId !== userId){
+        //     throw new Error("Not authorised")
+        // }
+        return document
+    }
+})
+export const getChildren = query({
+    args:{
+        parentDocument:v.optional(v.id("documents"))
+    },
+    handler:async(ctx,args)=>{
+        const documents = await ctx.db.query("documents")
+        .filter((q)=>
+        q.and(q.eq(q.field("isArchived"),false),q.eq(q.field("isPublished"),true),q.eq(q.field("parentDocument"),args.parentDocument))
+        )
+        .order("desc")
+        .collect()
+        console.log("documents children : ",documents)
+        return documents
+    }
+})

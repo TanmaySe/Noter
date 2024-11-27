@@ -13,25 +13,25 @@ export default function AskAi() {
   // Function to handle the actions when menu items are clicked
   const handleAction = async(action:String) => {
     const browserSelection = window.getSelection();
-    const apiKey = process.env.GOOGLE_API_KEY!
-    const genAI = new GoogleGenerativeAI(apiKey);
+    // const apiKey = process.env.NEXT_PUBLIC_GOOGLE_API_KEY!
+    // const genAI = new GoogleGenerativeAI(apiKey);
     
-    const model = genAI.getGenerativeModel({
-        model: "gemini-1.5-flash", // or whatever model you want to use
-    });
+    // const model = genAI.getGenerativeModel({
+    //     model: "gemini-1.5-flash", // or whatever model you want to use
+    // });
     
-    const generationConfig = {
-        temperature: 1,
-        topP: 0.95,
-        topK: 40,
-        maxOutputTokens: 8192,
-        responseMimeType: "text/plain",
-    };
+    // const generationConfig = {
+    //     temperature: 1,
+    //     topP: 0.95,
+    //     topK: 40,
+    //     maxOutputTokens: 8192,
+    //     responseMimeType: "text/plain",
+    // };
     
-    const chatSession = model.startChat({
-        generationConfig,
-        history: [],
-    });
+    // const chatSession = model.startChat({
+    //     generationConfig,
+    //     history: [],
+    // });
     // Sending the selected text to Gemini AI for correction
     const selection = editor.getSelection()
     const markdownOfSelection = await editor.blocksToMarkdownLossy(selection?.blocks)
@@ -49,8 +49,17 @@ export default function AskAi() {
     if(action == "long"){
       prompt += "Expand the following while maintaining markdowns : " + markdownOfSelection
     }
-    const result = await chatSession.sendMessage(prompt);
-    const finalResult = result.response.text()
+    // const result = await chatSession.sendMessage(prompt);
+    // const finalResult = result.response.text()
+    const res = await fetch("/api/generateAI", {
+      method: "POST",
+      headers: {
+          "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ inputText:prompt }),
+    });
+    const data = await res.json();
+
     const ids = [];
 
     if (selection?.blocks) {
@@ -59,7 +68,7 @@ export default function AskAi() {
       }
   }
   
-    const markdownToBlock = await editor.tryParseMarkdownToBlocks(finalResult);
+    const markdownToBlock = await editor.tryParseMarkdownToBlocks(data.response);
     editor.replaceBlocks(ids, markdownToBlock)
     
 }

@@ -56,29 +56,43 @@ export const Editor = ({initialContent,editable,id}:EditorProps) => {
       setError(null);
       setResponse(null);
       try {
-          const apiKey = process.env.GOOGLE_API_KEY!;
-          const genAI = new GoogleGenerativeAI(apiKey);
+          // const apiKey = process.env.NEXT_PUBLIC_GOOGLE_API_KEY!;
+          // const genAI = new GoogleGenerativeAI(apiKey);
   
-          const model = genAI.getGenerativeModel({
-              model: "gemini-1.5-flash", 
-          });
+          // const model = genAI.getGenerativeModel({
+          //     model: "gemini-1.5-flash", 
+          // });
 
-          const generationConfig = {
-              temperature: 1,
-              topP: 0.95,
-              topK: 40,
-              maxOutputTokens: 8192,
-              responseMimeType: "text/plain",
-          };
+          // const generationConfig = {
+          //     temperature: 1,
+          //     topP: 0.95,
+          //     topK: 40,
+          //     maxOutputTokens: 8192,
+          //     responseMimeType: "text/plain",
+          // };
   
-          const chatSession = model.startChat({
-              generationConfig,
-              history: [],
+          // const chatSession = model.startChat({
+          //     generationConfig,
+          //     history: [],
+          // });
+  
+          // const result = await chatSession.sendMessage(inputText);
+          // const finalResult = await result.response.text();
+          // setResponse(finalResult);
+          const res = await fetch("/api/generateAI", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ inputText }),
           });
-  
-          const result = await chatSession.sendMessage(inputText);
-          const finalResult = await result.response.text();
-          setResponse(finalResult);
+          const data = await res.json();
+
+          if (res.ok) {
+              setResponse(data.response);
+          } else {
+              setError("Failed to generate content.");
+          }
       } catch (err) {
           setError("Failed to generate content. Please try again.");
       } finally {
