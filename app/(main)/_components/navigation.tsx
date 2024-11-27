@@ -111,13 +111,13 @@ export const Navigation = () => {
                 </div>
                 <div>
                     <UserItem/>
-                    <Item
+                    {/* <Item
                     label="search"
                     icon={Search}
                     isSearch
                     onClick={search.onOpen}
-                    />
-                    <Item onClick={()=>{}} label="Settings" icon={Settings}/>
+                    /> */}
+                    {/* <Item onClick={()=>{}} label="Settings" icon={Settings}/> */}
 
                     <Item onClick={handleCreate} label="New page" icon={PlusCircle}/>
                 </div>

@@ -54,7 +54,6 @@ const DocumentIdPage = ({params}:DocumentIdPageProps) => {
                 <Toolbar preview initialData={document}/>
                 {childrenNotes && childrenNotes.length > 0 && (
                     <div className="mt-6">
-                        <h2 className="text-lg font-bold mb-4">Table of Contents</h2>
                         <ul className="space-y-4 mt-4 pl-8">
                             {childrenNotes.map((childNote) => (
                                 <li
